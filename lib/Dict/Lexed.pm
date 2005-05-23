@@ -1,4 +1,4 @@
-# $Id: Lexed.pm,v 1.5 2004/11/25 15:47:01 rousse Exp $
+# $Id: Lexed.pm,v 1.10 2005/05/23 15:35:40 rousse Exp $
 
 package Dict::Lexed;
 
@@ -8,7 +8,7 @@ Dict::Lexed - Lexed wrapper
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,10 @@ use IO::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
+
+my $unknown   = "\001";
+my $delimiter = "\002";
 
 =head1 Class methods
 
@@ -99,7 +102,7 @@ sub new {
     }, $class;
     $options ||= "";
     $mode_options ||= "";
-    my $command = "lexed $options consult $mode_options 2>/dev/null";
+    my $command = "lexed $options consult -f '' '$delimiter' '\n' '$unknown' $mode_options 2>/dev/null";
     open2($self->{_out}, $self->{_in}, "$command") or die "Can't run $command: $!";
     return $self;
 }
@@ -113,56 +116,51 @@ sub DESTROY {
 
 =head1 Methods
 
-=head2 $dict->query(I<$word>)
-
-Queries lexed about the word I<$word>.
-Returns lexed result as a list of words;
-
-This is actually a low-level method, not intented for direct use.
-
-=cut
-
-sub query {
-    my ($self, $word) = @_;
-
-    my ($in, $out) = ($self->{_in}, $self->{_out});
-    print $in $word . "\n";
-    my $line = <$out>;
-    chomp $line;
-    
-    return split(/\|/, $line);
-}
 
 =head2 $dict->check(I<$word>)
 
-Queries lexed for presence/absence of a given word.
-Returns a true value if word I<$word> is present in the dictionnary, false otherwise.
+Check the dictionnary for exact match of word I<$word>.
+Returns a true value if word is present in the dictionnary, false otherwise.
 
 =cut
 
 sub check {
     my ($self, $word) = @_;
 
-    my @query = $self->query($word);
-    return ($query[0] eq '<unknown>') ?
-	0 :
-	grep { /^$word$/ } @query;
+    my @query = $self->_query($word);
+    return (@query) ?
+	grep { /^\Q$word\E$/ } @query :
+	0;
 }
 
 =head2 $dict->suggest(I<$word>)
 
-Queries lexed for approximate match of a given word.
-Returns a list of words close to word I<$word>, according to parameters passed when creating the object.
+Check the dictionnary for approximate match of word I<$word>.
+Returns a list of approximated words from the dictionnary, according to
+parameters passed when creating the object.
 
 =cut
 
 sub suggest {
     my ($self, $word) = @_;
 
-    my @query = $self->query($word);
-    return ($query[0] eq '<unknown>') ?
+    my @query = $self->_query($word);
+    return (@query) ?
+	grep { ! /^$word$/ } @query :
+	();
+}
+
+sub _query {
+    my ($self, $word) = @_;
+
+    my ($in, $out) = ($self->{_in}, $self->{_out});
+    print $in $word . "\n";
+    my $line = <$out>;
+    chomp $line;
+
+    return $line eq $unknown ?
 	() :
-	grep { ! /^$word$/ } @query;
+	split(/$delimiter/, $line);
 }
 
 =head1 COPYRIGHT AND LICENSE

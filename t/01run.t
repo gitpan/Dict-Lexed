@@ -1,13 +1,10 @@
 #!/usr/bin/perl
-# $Id: test.pl,v 1.4 2004/11/25 15:48:06 rousse Exp $
+# $Id: 01run.t,v 1.6 2005/05/23 15:02:40 rousse Exp $
 
-use Test::More tests => 8;
+use Test::More tests => 7;
 use File::Temp qw/tempdir/;
+use Dict::Lexed;
 use strict;
-
-BEGIN {
-    use_ok 'Dict::Lexed';
-}
 
 my @words = map { chomp; $_} <DATA>;
 my $dir = tempdir(CLEANUP => 1);
