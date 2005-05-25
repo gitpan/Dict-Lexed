@@ -1,4 +1,4 @@
-# $Id: Lexed.pm,v 1.10 2005/05/23 15:35:40 rousse Exp $
+# $Id: Lexed.pm,v 1.12 2005/05/25 14:11:15 rousse Exp $
 
 package Dict::Lexed;
 
@@ -8,7 +8,7 @@ Dict::Lexed - Lexed wrapper
 
 =head1 VERSION
 
-Version 0.2
+Version 0.2.1
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ use IO::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '0.2.1';
 
 my $unknown   = "\001";
 my $delimiter = "\002";
@@ -127,7 +127,7 @@ Returns a true value if word is present in the dictionnary, false otherwise.
 sub check {
     my ($self, $word) = @_;
 
-    my @query = $self->_query($word);
+    my @query = $self->query($word);
     return (@query) ?
 	grep { /^\Q$word\E$/ } @query :
 	0;
@@ -144,13 +144,20 @@ parameters passed when creating the object.
 sub suggest {
     my ($self, $word) = @_;
 
-    my @query = $self->_query($word);
+    my @query = $self->query($word);
     return (@query) ?
 	grep { ! /^$word$/ } @query :
 	();
 }
 
-sub _query {
+=head2 $dict->query(I<$word>)
+
+Query the dictionnary for word I<$word>.
+Returns the raw result of the query, as a list of words.
+
+=cut
+
+sub query {
     my ($self, $word) = @_;
 
     my ($in, $out) = ($self->{_in}, $self->{_out});
