@@ -1,4 +1,4 @@
-# $Id: Lexed.pm,v 1.12 2005/05/25 14:11:15 rousse Exp $
+# $Id: Lexed.pm,v 1.14 2006/08/22 13:09:14 rousse Exp $
 
 package Dict::Lexed;
 
@@ -8,7 +8,7 @@ Dict::Lexed - Lexed wrapper
 
 =head1 VERSION
 
-Version 0.2.1
+Version 0.2.2
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ use IO::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 my $unknown   = "\001";
 my $delimiter = "\002";
@@ -67,7 +67,7 @@ sub create_dict {
     my $command = "lexed $options build $mode_options 2>/dev/null";
     open(LEXED, "| $command") or die "Can't run $command: $!";
     foreach my $word (@{$wordlist}) {
-	print LEXED $word . "\t" . $word . "\n";
+        print LEXED $word . "\t" . $word . "\n";
     }
     close(LEXED);
 }
@@ -97,8 +97,8 @@ specific consultation options passed to lexed
 sub new {
     my ($class, $options, $mode_options) = @_;
     my $self = bless {
-	_in  => IO::Handle->new(),
-	_out => IO::Handle->new()
+        _in  => IO::Handle->new(),
+        _out => IO::Handle->new()
     }, $class;
     $options ||= "";
     $mode_options ||= "";
@@ -129,8 +129,8 @@ sub check {
 
     my @query = $self->query($word);
     return (@query) ?
-	grep { /^\Q$word\E$/ } @query :
-	0;
+    grep { /^\Q$word\E$/ } @query :
+    0;
 }
 
 =head2 $dict->suggest(I<$word>)
@@ -146,8 +146,8 @@ sub suggest {
 
     my @query = $self->query($word);
     return (@query) ?
-	grep { ! /^$word$/ } @query :
-	();
+        grep { ! /^$word$/ } @query :
+        ();
 }
 
 =head2 $dict->query(I<$word>)
@@ -166,8 +166,8 @@ sub query {
     chomp $line;
 
     return $line eq $unknown ?
-	() :
-	split(/$delimiter/, $line);
+        () :
+        split(/$delimiter/, $line);
 }
 
 =head1 COPYRIGHT AND LICENSE

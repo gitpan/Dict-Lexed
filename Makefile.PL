@@ -1,7 +1,10 @@
-# $Id: Makefile.PL,v 1.3 2005/05/02 16:04:21 rousse Exp $
+# $Id: Makefile.PL,v 1.5 2006/08/22 13:10:01 rousse Exp $
 
 use ExtUtils::MakeMaker;
-use ExtUtils::MakeMaker::Coverage;
+eval {
+    require ExtUtils::MakeMaker::Coverage;
+    import ExtUtils::MakeMaker::Coverage;
+};
 
 WriteMakefile(
     NAME          => 'Dict::Lexed',
@@ -9,14 +12,14 @@ WriteMakefile(
     ABSTRACT_FROM => 'lib/Dict/Lexed.pm',
     AUTHOR        => 'Guillaume Rousse <grousse@cpan.org>',
     PREREQ_PM     => {
-	'IPC::Open2' => 0,
-	'IO::Handle' => 0
+        'IPC::Open2' => 0,
+        'IO::Handle' => 0
     },
     dist           => {
-	COMPRESS => 'gzip -9f',
-	SUFFIX   => 'gz',
+        COMPRESS => 'gzip -9f',
+        SUFFIX   => 'gz',
     },
     clean          => {
-	FILES => 'Dict-Lexed-*'
+        FILES => 'Dict-Lexed-*'
     },
 );
